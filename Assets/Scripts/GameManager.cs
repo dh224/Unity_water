@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     public UnityEngine.UI.Text historyScoreText;
     public int currentScore = 0;
     public int historyScore = 0;
+    public Vector2 basewallpos;
+    public GameObject basewall;
     // Start is called before the first frame update
 
     private void Awake()
@@ -65,19 +67,23 @@ public class GameManager : MonoBehaviour
             }
             if (Input.GetMouseButtonUp(0))
             {
-                currentFruitList[0].GetComponent<Rigidbody2D>().gravityScale = 1;
+                currentFruitList[0].GetComponent<Rigidbody2D>().gravityScale = 2f;
                 currentFruitList[0].GetComponent<Fruits>().fruitState = FruitState.Falling;
                 currentFruitList.RemoveAt(0);
-                Invoke("getRandomFruit",0.5f);
+                Invoke("getRandomFruit",0.75f);
             }
         }
-
+        Rigidbody2D rigidbody = basewall.GetComponent<Rigidbody2D>();
+        rigidbody.velocity = Vector3.zero;
+        rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
+        rigidbody.constraints = RigidbodyConstraints2D.None;
+        basewall.transform.position = basewallpos;
     }
 
     void getRandomFruit()
     {
         gameState = GameState.runing;
-        int index = (int)Random.Range(0, 3);
+        int index = (int)Random.Range(0,9);
         GameObject fruitPrefabs = fruits[index];
         GameObject newFruit = Instantiate(fruitPrefabs, startTransform.position, fruitPrefabs.transform.rotation);
         newFruit.GetComponent<Rigidbody2D>().gravityScale = 0;
@@ -92,13 +98,13 @@ public class GameManager : MonoBehaviour
         int historyHighestScore = PlayerPrefs.GetInt("Highest Score in History.");
         historyScoreText.text = historyHighestScore.ToString();
         readline.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0, 0f);
-
+        basewallpos= basewall.transform.position;
         if (startBtn)
         {
             startBtn.gameObject.SetActive(false);
         }
 
-        Invoke("getRandomFruit", 0.25f);
+        Invoke("getRandomFruit", 0.75f);
     }
     public void GameOver()
     {
